@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+    <span><mat-icon>music_note</mat-icon>MyDJ</span>
+
+    <!-- This fills the remaining space of the current row -->
+    <span class="spacer"></span>
+
+    <a (click)="goHome()"><span>
+        <mat-icon>home</mat-icon>
+        Home
+    </span></a>
+    <span class="button-spacer"></span>
+    <a (click)="logout()"><span *ngIf="isLoggedIn()">
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+    </span></a>
+
+
+</mat-toolbar>
+
+<router-outlet></router-outlet>
