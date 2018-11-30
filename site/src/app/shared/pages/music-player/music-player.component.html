@@ -1,3 +1,10 @@
-<p>
-  music-player works!
-</p>
+<button>Next</button>
+<button id="previous">Previous</button>
+<button (click)="onPause()">Pause</button>
+<button (click)="onResume()">Resume</button>
+
+<div>
+    <div *ngFor="let song of tracks" (click)="playSong(song)">
+        {{song.name}} <i>By</i> {{song.artistName}}
+    </div>
+</div>

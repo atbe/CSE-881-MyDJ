@@ -48,7 +48,9 @@
             "styles": [
               "src/styles.less"
             ],
-            "scripts": []
+            "scripts": [
+              "src/napster.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -14,6 +14,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { SelectArtistsComponent } from './select-artists/select-artists.component';
 import { LoginComponent } from './login/login.component';
 import { MusicPlayerComponent } from './music-player/music-player.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
 	declarations: [LoginComponent, SelectArtistsComponent, MusicPlayerComponent],
@@ -29,7 +30,8 @@ import { MusicPlayerComponent } from './music-player/music-player.component';
 		FormsModule,
 		FlexLayoutModule,
 		MatRippleModule,
-		MatCardModule
+		MatCardModule,
+		HttpClientModule
 	]
 })
 export class PagesModule { }
