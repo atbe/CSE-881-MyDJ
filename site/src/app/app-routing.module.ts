@@ -3,12 +3,14 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { LoginComponent } from './shared/pages/login/login.component';
 import { SelectArtistsComponent } from './shared/pages/select-artists/select-artists.component';
+import { MusicPlayerComponent } from './shared/pages/music-player/music-player.component';
 
 import { IsSignedUpGuard } from './shared/guards/is-signed-up.guard';
 
 const routes: Routes = [
 	{ path: 'login', component: LoginComponent },
 	{ path: 'select-artists', component: SelectArtistsComponent, canActivate: [IsSignedUpGuard] },
+	{ path: 'music-player', component: MusicPlayerComponent, canActivate: [IsSignedUpGuard] },
 	{ path: '',   redirectTo: '/login', pathMatch: 'full' },
 	// { path: '**', component: PageNotFoundComponent }
 ];

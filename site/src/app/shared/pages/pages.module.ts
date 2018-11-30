@@ -1,19 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoginComponent } from './login/login.component';
 import {
-	MatButtonModule,
+	MatButtonModule, MatCardModule,
 	MatFormFieldModule,
 	MatGridListModule,
-	MatInputModule,
+	MatInputModule, MatRippleModule,
 	MatSelectModule,
 	MatStepperModule
 } from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FlexLayoutModule } from '@angular/flex-layout';
+
 import { SelectArtistsComponent } from './select-artists/select-artists.component';
+import { LoginComponent } from './login/login.component';
+import { MusicPlayerComponent } from './music-player/music-player.component';
 
 @NgModule({
-	declarations: [LoginComponent, SelectArtistsComponent],
+	declarations: [LoginComponent, SelectArtistsComponent, MusicPlayerComponent],
 	imports: [
 		CommonModule,
 		MatStepperModule,
@@ -23,7 +26,10 @@ import { SelectArtistsComponent } from './select-artists/select-artists.componen
 		MatInputModule,
 		MatSelectModule,
 		MatGridListModule,
-		FormsModule
+		FormsModule,
+		FlexLayoutModule,
+		MatRippleModule,
+		MatCardModule
 	]
 })
 export class PagesModule { }

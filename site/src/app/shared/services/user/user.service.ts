@@ -14,7 +14,7 @@ export class UserService {
 	}
 
 	public getUser(): User {
-		return this.storage.getItem("currentUser") as User;
+		return JSON.parse(this.storage.getItem("currentUser")) as User;
 	}
 
 	public likeArtist(artistName: string, artistId: string = null) {
