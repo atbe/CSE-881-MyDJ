@@ -36,4 +36,8 @@ export class UserService {
 	public logout() {
 		this.storage.clear();
 	}
+
+	public getRandomArtist(): string {
+		return this.getUser().favoriteArtists[Math.floor(Math.random() * this.getUser().favoriteArtists.length)];
+	}
 }

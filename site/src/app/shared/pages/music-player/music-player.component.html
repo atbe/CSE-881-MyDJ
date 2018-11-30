@@ -1,10 +1,8 @@
-<button>Next</button>
+<button (click)="onNext()">Next</button>
 <button id="previous">Previous</button>
 <button (click)="onPause()">Pause</button>
 <button (click)="onResume()">Resume</button>
 
-<div>
-    <div *ngFor="let song of tracks" (click)="playSong(song)">
-        {{song.name}} <i>By</i> {{song.artistName}}
-    </div>
+<div *ngIf="currentTrack !== null && currentTrack != undefined">
+    {{currentTrack.name}} <i>By</i> {{currentTrack.artistName}}
 </div>
