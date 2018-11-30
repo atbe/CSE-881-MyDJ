@@ -13,8 +13,9 @@
 # limitations under the License.
 
 # [START gae_python37_app]
-from flask import Flask
-
+from flask import Flask, jsonify, request
+import pickle
+import random
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
@@ -25,6 +26,17 @@ app = Flask(__name__)
 def hello():
     """Return a friendly HTTP greeting."""
     return 'Hello World! TEst ok'
+
+
+@app.route('/top_artists')
+def get_top_artists():
+    seed = request.args.get("seed", type=int)
+    count = request.args.get("count", 100, type=int)
+    if seed is not None:
+        random.seed(seed)
+
+    top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+    return jsonify(random.sample(top_artists, count))
 
 
 if __name__ == '__main__':
