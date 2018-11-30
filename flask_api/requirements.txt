@@ -1,1 +1,4 @@
 Flask==1.0.2
+tensorflow==1.7.0
+scipy==1.1.0
+tffm==1.0.1
