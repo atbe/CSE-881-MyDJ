@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UserService } from './shared/services/user/user.service';
 import { Router } from '@angular/router';
+import User from './shared/services/user/user.model';
 
 @Component({
 	selector: 'app-root',
@@ -9,10 +10,13 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
 	title = 'MyDJ';
+	user: User;
 
 	constructor(
 		private _userService: UserService,
-		private _router: Router) {}
+		private _router: Router) {
+		this.user = this._userService.getUser();
+	}
 
 	public logout() {
 		this._userService.logout();

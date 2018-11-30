@@ -4,6 +4,10 @@
     <!-- This fills the remaining space of the current row -->
     <span class="spacer"></span>
 
+    <span *ngIf="user !== null">
+        Welcome, {{user.name}}
+    </span>
+    <span class="button-spacer"></span>
     <a (click)="goHome()"><span>
         <mat-icon>home</mat-icon>
         Home
