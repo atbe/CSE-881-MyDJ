@@ -1,23 +1,34 @@
-<div fxFlex="1 1 auto"></div>
-<div fxFlex="1 1 70%">
-    <div fxLayout="row wrap" fxLayoutGap="16px" fxLayoutAlign="flex-start">
-        <ng-container *ngFor="let artist of artists">
-            <div matRipple
-                (click)="toggleArtist(artist)"
-                class="artist box"
-                fxFlex="0 0 calc(25% - 16px)"
-                fxFlex.lt-md="0 0 calc(33.3% - 16px)"
-                fxFlex.lt-sm="0 0 calc(100% - 16px)">
-                <img class="center" src="https://i.kym-cdn.com/photos/images/original/001/250/216/305.jpg">
-                <svg *ngIf="isArtistSelected(artist)" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
-                    <circle class="path circle" fill="none" stroke="#73AF55" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1"/>
-                    <polyline class="path check" fill="none" stroke="#73AF55" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 "/>
-                </svg>
-                <p class="artist-name">{{artist}}</p>
-            </div>
-        </ng-container>
-    </div>
-
-    <button mat-raised-button color="accent" (click)="onDone()">Done</button>
+<div class="loading-message" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+    <h2>Loading artists...</h2>
 </div>
-<div fxFlex="1 1 auto"></div>
+
+<div *ngIf="!isLoading">
+    <div fxFlex="1 1 auto"></div>
+    <div fxFlex="1 1 70%" *ngIf="artistImageUrls != null">
+        <p
+                class="center"><i>Click on an artist to add them to your favorites. You <strong>must choose
+            at least 5.</strong></i></p>
+        <button [disabled]="this.user.favoriteArtists.length < 5" mat-raised-button color="accent"
+                (click)="onDone()">Done
+        </button>
+        <div fxLayout="row wrap" fxLayoutGap="16px" fxLayoutAlign="flex-start">
+            <ng-container *ngFor="let artist of artists">
+                <div matRipple
+                    (click)="toggleArtist(artist)"
+                    class="artist box"
+                    fxFlex="0 0 calc(25% - 16px)"
+                    fxFlex.lt-md="0 0 calc(33.3% - 16px)"
+                    fxFlex.lt-sm="0 0 calc(100% - 16px)">
+                    <figure>
+                        <img class="center" src="{{getArtistCoverUrl(artist)}}">
+                        <figcaption>{{artist['name']}} <mat-icon *ngIf="isArtistSelected(artist['name'])">check_circle
+                        </mat-icon></figcaption>
+
+                    </figure>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div fxFlex="1 1 auto"></div>
+</div>

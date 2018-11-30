@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import Track from './track.model';
-import * as querystring from 'querystring';
 import { HttpClient } from '@angular/common/http';
-import User from '../../services/user/user.model';
 import { UserService } from '../../services/user/user.service';
 import { NapsterService } from '../../services/napster.service';
+
 declare var Napster: any;
 
 @Component({
@@ -12,9 +11,9 @@ declare var Napster: any;
 	templateUrl: './music-player.component.html',
 	styleUrls: ['./music-player.component.less']
 })
-export class MusicPlayerComponent implements OnInit {
+export class MusicPlayerComponent implements OnInit, OnDestroy {
+
 	tracks: Track[];
-	artistCache = {};
 	artistTopTracksCache = {};
 	trackCache = {};
 
@@ -27,75 +26,68 @@ export class MusicPlayerComponent implements OnInit {
 	currentTrackCurrentTime: number;
 	progressPercent: number;
 
-	private readonly API_KEY = "MWRkMTAzMmEtZDg1OS00MjgxLTlkOWItYWZiZDRjZTFiZWJh";
-	private readonly API_SECRET = "M2YwMWMyNmItNTUzZi00MWI3LThhYTQtZjY3MjkwM2Y4ODUy";
-
 	constructor(
 		private http: HttpClient,
 		private userService: UserService,
 		private napsterService: NapsterService) {
 
 		// temporary
-		this.userService.likeArtist('The Beatles');
-		this.userService.likeArtist('Beyonce');
-		this.userService.likeArtist('Drake');
-		this.userService.likeArtist('21 savage');
-		this.userService.likeArtist('2pac');
+		// this.userService.likeArtist('The Beatles');
+		// this.userService.likeArtist('Beyonce');
+		// this.userService.likeArtist('Drake');
+		// this.userService.likeArtist('21 savage');
+		// this.userService.likeArtist('2pac');
 
-		Napster.init({  consumerKey: this.API_KEY, isHTML5Compatible: true });
+		Napster.init({  consumerKey: this.napsterService.getApiKey(), isHTML5Compatible: true });
 	}
 
-	ngOnInit() {
-		const key = window.btoa(`${this.API_KEY}:${this.API_SECRET}`);
-		this.http.post('https://api.napster.com/oauth/token', {
-			username: "lupasaw@heros3.com",
-			password: "eaUQx2HdaVxI72UV475n",
-			grant_type: 'password'
-		}, {headers: {"Authorization": `Basic ${key}`}}).subscribe((authData: any) => {
-			console.log("HERE's some data = ");
-			console.log(authData);
+	async ngOnInit() {
+		if (!this.napsterService.isSetup) {
+			await this.napsterService.init();
+		}
 
-			Napster.player.on('ready', (e) => {
-				const params = {
-					"accessToken": authData['access_token'],
-					"refreshToken": authData['refresh_token']
-				};
-				this.napsterService.setAccessToken(authData['access_token']);
-				console.log("PARAMS = ");
-				console.log(params);
-				Napster.member.set(params);
+		Napster.player.on('ready', (e) => {
+			const params = {
+				"accessToken": this.napsterService.getAccessToken(),
+				"refreshToken": this.napsterService.getRefreshToken()
+			};
+			this.napsterService.setAccessToken(this.napsterService.getAccessToken());
+			console.log("PARAMS = ");
+			console.log(params);
+			Napster.member.set(params);
 
-				console.log("NAPSTER PLAYER READY");
-				console.log(Napster);
-				this.beginPlayback();
-			});
-
-			Napster.player.on('playevent', (e) => {
-				const playing = e.data.playing;
-				const paused = e.data.paused;
-				const currentTrack = e.data.id.toLowerCase();
-
-				console.log(playing);
-				console.log(paused);
-				console.log(currentTrack);
-
-				// user clicked previous button
-				console.log(this.trackCache);
-				if (this.currentTrack !== null && this.currentTrack.id.toLowerCase() !== currentTrack) {
-					const track: Track = this.trackCache[currentTrack];
-					this.currentTrack = track;
-					this.currentArtist = this.artistCache[track.artistName];
-				}
-			});
+			console.log("NAPSTER PLAYER READY");
+			console.log(Napster);
+			this.beginPlayback();
 		});
+
+		Napster.player.on('playevent', (e) => {
+			const playing = e.data.playing;
+			const paused = e.data.paused;
+			const currentTrack = e.data.id.toLowerCase();
+
+			console.log(playing);
+			console.log(paused);
+			console.log(currentTrack);
+
+			// user clicked previous button
+			console.log(this.trackCache);
+			if (this.currentTrack !== null && this.currentTrack.id.toLowerCase() !== currentTrack) {
+				const track: Track = this.trackCache[currentTrack];
+				this.currentTrack = track;
+				this.currentArtist = this.napsterService.getArtist(track.artistName);
+			}
+		});
+	}
+
+	ngOnDestroy() {
+		this.onPause();
+		Napster.member.unset();
 	}
 
 	private async beginPlayback() {
 		Napster.player.clearQueue();
-		const artist = await this.getNextArtist();
-		this.currentArtist = artist;
-		const track = await this.getRandomTopTrackForArtist(artist['id']);
-		this.playSong(track);
+		await this.onPlayNextArtist();
 	}
 
 	async getNextArtist(): Promise<any> {
@@ -103,7 +95,7 @@ export class MusicPlayerComponent implements OnInit {
 		while (artist === null) {
 			const artistToPlay = this.userService.getRandomArtist();
 			console.log("Starting play for " + artistToPlay);
-			artist = await this.getArtistId(artistToPlay);
+			artist = await this.getArtist(artistToPlay);
 			if (artist === null) {
 				console.error("Failed to get artist = " + artistToPlay);
 				continue;
@@ -112,19 +104,8 @@ export class MusicPlayerComponent implements OnInit {
 		}
 	}
 
-	async getArtistId(artistName: string): Promise<any> {
-		if (artistName in this.artistCache) {
-			return Promise.resolve(this.artistCache[artistName]);
-		}
-
-		return this.napsterService.getArtistId(artistName).toPromise().then((data: any) => {
-			if (data['meta']['returnedCount'] !== 1) {
-				return Promise.reject('Could not find artist ID for artist = ' + artistName);
-			} else {
-				this.artistCache[artistName] = data['search']['data']['artists'][0];
-				return Promise.resolve(data['search']['data']['artists'][0]);
-			}
-		});
+	getArtist(artistName: string): Promise<any> {
+		return this.napsterService.getArtist(artistName).toPromise();
 	}
 
 	async getRandomTopTrackForArtist(artistId: string): Promise<Track> {
@@ -133,6 +114,7 @@ export class MusicPlayerComponent implements OnInit {
 		}
 
 		return this.napsterService.getRandomTopTrackForArtist(artistId).toPromise().then((data) => {
+			console.log(artistId);
 			console.log("Search results:");
 			console.log(data);
 			this.artistTopTracksCache[artistId] = data['tracks'];
@@ -142,6 +124,9 @@ export class MusicPlayerComponent implements OnInit {
 
 	getRandomTopTrackFromArtistCache(artistId: string): Track {
 		const tracks = this.artistTopTracksCache[artistId];
+		if (tracks.length === 0) {
+			return null;
+		}
 		let track: Track = null;
 		while (track === null) {
 			track = tracks[Math.floor(Math.random() * tracks.length)];
@@ -171,21 +156,6 @@ export class MusicPlayerComponent implements OnInit {
 		this.isPlaying = true;
 	}
 
-	onNext() {
-		this.getNextArtist().then((artist: any) => {
-			console.log("OnNext");
-			console.log(artist);
-			this.currentArtist = artist;
-			return this.getRandomTopTrackForArtist(artist['id']);
-		}).then((track: Track) => {
-			return this.playSong(track);
-		});
-	}
-
-	getAlbumCoverImageUrl(albumId: string): string {
-		return this.napsterService.getAlbumCoverImageUrl(albumId);
-	}
-
 	onLike(artistName: string) {
 		this.userService.likeArtist(artistName);
 	}
@@ -196,5 +166,19 @@ export class MusicPlayerComponent implements OnInit {
 
 	onPrevious() {
 		Napster.player.previous();
+	}
+
+	async onPlayNextArtist() {
+		let artist = await this.getNextArtist();
+		this.currentArtist = artist;
+		let track: Track = null;
+		while (track === null) {
+			track = await this.getRandomTopTrackForArtist(artist['id']);
+			if (track === null) {
+				artist = await this.getNextArtist();
+			}
+		}
+		track['coverImgUrl'] = await this.napsterService.getAlbumCoverUrl(track.albumId).toPromise();
+		this.playSong(track);
 	}
 }

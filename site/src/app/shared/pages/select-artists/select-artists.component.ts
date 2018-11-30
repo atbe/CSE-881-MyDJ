@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import User from '../../services/user/user.model';
 import { UserService } from '../../services/user/user.service';
 import { Router } from '@angular/router';
+import { MydjMlService } from '../../services/mydj-ml.service';
+import { NapsterService } from '../../services/napster.service';
+import { Observable } from 'rxjs';
 
 @Component({
 	selector: 'app-select-artists',
@@ -9,26 +12,41 @@ import { Router } from '@angular/router';
 	styleUrls: ['./select-artists.component.less']
 })
 export class SelectArtistsComponent implements OnInit {
-	artists = Array.from(Array(50).keys());
+	isLoading = true;
+
+	artists: any[];
 	user: User;
+	private artistImageUrls: string[] = null;
 
 	constructor(
 		private _userService: UserService,
-		private router: Router) {
+		private router: Router,
+		private mydjMlService: MydjMlService,
+		private napsterService: NapsterService) {
 		this.user = this._userService.getUser();
 	}
 
-	ngOnInit() {
+	async ngOnInit() {
+		if (!this.napsterService.isSetup) {
+			await this.napsterService.init();
+		}
+
+		this.artists = await this.mydjMlService.getTopArtists(12).toPromise();
+		this.artists = await Promise.all(this.artists.map(a => this.napsterService.getArtist(a).toPromise()));
+		this.artistImageUrls = await Promise.all(this.artists.map(a => this.napsterService.getArtistCoverUrl(a['id']).toPromise()));
+		this.isLoading = false;
 	}
 
-	toggleArtist(artistName: any) {
-		console.log("Toggling " + artistName);
+	toggleArtist(artist: any) {
+		const artistName = artist['name'];
+		console.log(artist);
 		if (this.user.favoriteArtists.indexOf(artistName) >= 0) {
-			this.user.favoriteArtists = this.user.favoriteArtists.filter(a => a !== artistName);
+			this._userService.dislikeArtist(artistName);
+			this.user = this._userService.getUser();
 			return;
 		}
-		this.user.favoriteArtists.push(artistName);
-		console.log(this.user.favoriteArtists);
+		this._userService.likeArtist(artistName);
+		this.user = this._userService.getUser();
 	}
 
 	onDone() {
@@ -38,5 +56,9 @@ export class SelectArtistsComponent implements OnInit {
 
 	isArtistSelected(artistName: string): boolean {
 		return this.user.favoriteArtists.indexOf(artistName) >= 0;
+	}
+
+	getArtistCoverUrl(artist: any): string {
+		return this.artistImageUrls[this.artists.indexOf(artist)];
 	}
 }
