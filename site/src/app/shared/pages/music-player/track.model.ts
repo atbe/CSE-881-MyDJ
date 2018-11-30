@@ -3,5 +3,6 @@ export default interface Track {
 	id: string;
 	artistName: string;
 	artistId: string;
+	albumId: string;
 	name: string;
 }

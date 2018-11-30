@@ -1,8 +1,22 @@
-<button (click)="onNext()">Next</button>
-<button id="previous">Previous</button>
-<button (click)="onPause()">Pause</button>
-<button (click)="onResume()">Resume</button>
-
-<div *ngIf="currentTrack !== null && currentTrack != undefined">
-    {{currentTrack.name}} <i>By</i> {{currentTrack.artistName}}
+<div *ngIf="currentTrack !== null && currentTrack != undefined" class="center">
+    <mat-card class="example-card">
+        <mat-card-header>
+            <div mat-card-avatar class="example-header-image"></div>
+            <mat-card-title>{{currentTrack.name}}</mat-card-title>
+            <mat-card-subtitle>{{currentTrack.artistName}}</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image="" src="{{getAlbumCoverImageUrl(currentTrack.albumId)}}">
+        <mat-card-actions>
+            <div fxFlex="0 0 10%"></div>
+            <div fxFlex="0 0 80%">
+                <button (click)="onDislike(currentTrack.artistName)" mat-button><mat-icon>thumb_down</mat-icon></button>
+                <button (click)="onPrevious()" mat-button><mat-icon>skip_previous</mat-icon></button>
+                <button (click)="onResume()" *ngIf="!isPlaying" mat-button><mat-icon>play_arrow</mat-icon></button>
+                <button (click)="onPause()" *ngIf="isPlaying" mat-button><mat-icon>pause</mat-icon></button>
+                <button (click)="onNext()" mat-button><mat-icon>skip_next</mat-icon></button>
+                <button (click)="onLike(currentTrack.artistName)" mat-button><mat-icon>thumb_up</mat-icon></button>
+            </div>
+            <div fxFlex="0 0 10%"></div>
+        </mat-card-actions>
+    </mat-card>
 </div>

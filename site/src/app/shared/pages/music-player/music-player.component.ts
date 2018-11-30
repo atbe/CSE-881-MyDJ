@@ -16,11 +16,16 @@ export class MusicPlayerComponent implements OnInit {
 	tracks: Track[];
 	artistCache = {};
 	artistTopTracksCache = {};
+	trackCache = {};
 
 	alreadyPlayedSongs: Track[] = [];
 
-	currentTrack: Track;
+	currentTrack: Track = null;
 	currentArtist: any;
+	isPlaying = false;
+	currentTrackTotalTime: number;
+	currentTrackCurrentTime: number;
+	progressPercent: number;
 
 	private readonly API_KEY = "MWRkMTAzMmEtZDg1OS00MjgxLTlkOWItYWZiZDRjZTFiZWJh";
 	private readonly API_SECRET = "M2YwMWMyNmItNTUzZi00MWI3LThhYTQtZjY3MjkwM2Y4ODUy";
@@ -29,14 +34,15 @@ export class MusicPlayerComponent implements OnInit {
 		private http: HttpClient,
 		private userService: UserService,
 		private napsterService: NapsterService) {
+
+		// temporary
 		this.userService.likeArtist('The Beatles');
 		this.userService.likeArtist('Beyonce');
 		this.userService.likeArtist('Drake');
 		this.userService.likeArtist('21 savage');
 		this.userService.likeArtist('2pac');
-		console.log(Napster);
+
 		Napster.init({  consumerKey: this.API_KEY, isHTML5Compatible: true });
-		// Napster.member.set({""})
 	}
 
 	ngOnInit() {
@@ -62,6 +68,24 @@ export class MusicPlayerComponent implements OnInit {
 				console.log("NAPSTER PLAYER READY");
 				console.log(Napster);
 				this.beginPlayback();
+			});
+
+			Napster.player.on('playevent', (e) => {
+				const playing = e.data.playing;
+				const paused = e.data.paused;
+				const currentTrack = e.data.id.toLowerCase();
+
+				console.log(playing);
+				console.log(paused);
+				console.log(currentTrack);
+
+				// user clicked previous button
+				console.log(this.trackCache);
+				if (this.currentTrack !== null && this.currentTrack.id.toLowerCase() !== currentTrack) {
+					const track: Track = this.trackCache[currentTrack];
+					this.currentTrack = track;
+					this.currentArtist = this.artistCache[track.artistName];
+				}
 			});
 		});
 	}
@@ -132,15 +156,19 @@ export class MusicPlayerComponent implements OnInit {
 	playSong(song: Track) {
 		console.log("Playing song" + song.name);
 		this.currentTrack = song;
+		this.trackCache[song.id] = song;
 		Napster.player.play(song.id.charAt(0).toUpperCase() + song.id.slice(1));
+		this.isPlaying = true;
 	}
 
 	onPause() {
 		Napster.player.pause();
+		this.isPlaying = false;
 	}
 
 	onResume() {
 		Napster.player.resume();
+		this.isPlaying = true;
 	}
 
 	onNext() {
@@ -152,5 +180,21 @@ export class MusicPlayerComponent implements OnInit {
 		}).then((track: Track) => {
 			return this.playSong(track);
 		});
+	}
+
+	getAlbumCoverImageUrl(albumId: string): string {
+		return this.napsterService.getAlbumCoverImageUrl(albumId);
+	}
+
+	onLike(artistName: string) {
+		this.userService.likeArtist(artistName);
+	}
+
+	onDislike(artistName: string) {
+		this.userService.dislikeArtist(artistName);
+	}
+
+	onPrevious() {
+		Napster.player.previous();
 	}
 }

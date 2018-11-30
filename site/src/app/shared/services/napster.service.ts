@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 export class NapsterService {
 	private accessToken: string;
 	readonly API_BASE_URL = "https://api.napster.com/v2.2";
+	readonly IMG_BASE_URL = "https://direct.napster.com/imageserver/v2/";
 
 	constructor(private httpClient: HttpClient) {}
 
@@ -33,6 +34,10 @@ export class NapsterService {
 					"Authorization": `Bearer ${this.accessToken}`
 				}
 			});
+	}
+
+	getAlbumCoverImageUrl(albumId: string): string {
+		return `${this.IMG_BASE_URL}/albums/${albumId}/images/500x500.jpg`;
 	}
 }
 

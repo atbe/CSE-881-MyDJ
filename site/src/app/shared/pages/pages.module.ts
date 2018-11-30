@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import {
 	MatButtonModule, MatCardModule,
 	MatFormFieldModule,
-	MatGridListModule,
-	MatInputModule, MatRippleModule,
+	MatGridListModule, MatIconModule,
+	MatInputModule, MatProgressBarModule, MatRippleModule,
 	MatSelectModule,
 	MatStepperModule
 } from '@angular/material';
@@ -31,7 +31,9 @@ import { HttpClientModule } from '@angular/common/http';
 		FlexLayoutModule,
 		MatRippleModule,
 		MatCardModule,
-		HttpClientModule
+		HttpClientModule,
+		MatProgressBarModule,
+		MatIconModule
 	]
 })
 export class PagesModule { }
