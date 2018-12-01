@@ -16,6 +16,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from werkzeug.contrib.cache import SimpleCache
+from artistlib import ArtistResponse
 import pickle
 import random
 
@@ -24,6 +25,7 @@ import random
 app = Flask(__name__)
 CORS(app)
 cache = SimpleCache()
+
 
 @app.route('/')
 def hello():
@@ -45,6 +47,18 @@ def get_top_artists_random():
         cache.set('top-artists', top_artists, timeout= 5*60)
 
     return jsonify(random.sample(top_artists, count))
+
+
+@app.route("/top_n_artists")
+def get_top_n_artists():
+    info = request.args.get("info", type=dict)
+    num_artists = request.args.get("num_artists", type=int)
+
+    column_map = pickle.load(open('column_map.pickle', 'rb'))
+    top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+
+    ar = ArtistResponse()
+    return jsonify(ar.get_top_predicted_artists(info, column_map, top_artists, num_artists))
 
 
 @app.route('/top_artists')
