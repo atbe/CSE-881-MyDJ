@@ -24,6 +24,7 @@ import random
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/')
 def hello():
     """Return a friendly HTTP greeting."""
@@ -45,20 +46,11 @@ def get_top_n_artists():
     info = request.args.get("info", type=dict)
     num_artists = request.args.get("num_artists", type=int)
 
-    info = {
-        "age": 21,
-        "gender": "m",
-        "country": "United States",
-        "likedArtists": [
-            "beyonce",
-            "drake"
-        ]
-    }
     column_map = pickle.load(open('column_map.pickle', 'rb'))
     top_artists = pickle.load(open('top_artists.pickle', 'rb'))
 
     ar = ArtistResponse()
-    return str(ar.get_top_predicted_artists(info, column_map, top_artists, num_artists))
+    return jsonify(ar.get_top_predicted_artists(info, column_map, top_artists, num_artists))
 
 
 @app.route('/top_artists')
