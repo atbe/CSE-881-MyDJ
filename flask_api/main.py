@@ -14,13 +14,14 @@
 
 # [START gae_python37_app]
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import pickle
 import random
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def hello():
@@ -28,8 +29,8 @@ def hello():
     return 'Hello World! TEst ok'
 
 
-@app.route('/top_artists')
-def get_top_artists():
+@app.route('/top_artists_random')
+def get_top_artists_random():
     seed = request.args.get("seed", type=int)
     count = request.args.get("count", 100, type=int)
     if seed is not None:
@@ -37,6 +38,19 @@ def get_top_artists():
 
     top_artists = pickle.load(open('top_artists.pickle', 'rb'))
     return jsonify(random.sample(top_artists, count))
+
+
+@app.route('/top_artists')
+def get_top_artists():
+    page_size = request.args.get("pageSize", 100, type=int)
+    page_num = request.args.get("pageNum", 0, type=int)
+
+    top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+
+    start_index = page_num * page_size;
+    end_index = start_index + page_size;
+
+    return jsonify(top_artists[start_index:end_index])
 
 
 if __name__ == '__main__':
