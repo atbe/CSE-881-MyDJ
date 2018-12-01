@@ -15,6 +15,7 @@
 # [START gae_python37_app]
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from werkzeug.contrib.cache import SimpleCache
 import pickle
 import random
 
@@ -22,6 +23,7 @@ import random
 # called `app` in `main.py`.
 app = Flask(__name__)
 CORS(app)
+cache = SimpleCache()
 
 @app.route('/')
 def hello():
@@ -36,7 +38,12 @@ def get_top_artists_random():
     if seed is not None:
         random.seed(seed)
 
-    top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+    top_artists = cache.get('top-artists')
+
+    if top_artists is None:
+        top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+        cache.set('top-artists', top_artists, timeout= 5*60)
+
     return jsonify(random.sample(top_artists, count))
 
 
@@ -45,7 +52,11 @@ def get_top_artists():
     page_size = request.args.get("pageSize", 100, type=int)
     page_num = request.args.get("pageNum", 0, type=int)
 
-    top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+    top_artists = cache.get('top-artists')
+
+    if top_artists is None:
+        top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+        cache.set('top-artists', top_artists, timeout= 5*60)
 
     start_index = page_num * page_size;
     end_index = start_index + page_size;
