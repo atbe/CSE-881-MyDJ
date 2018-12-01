@@ -12,15 +12,12 @@ class ArtistResponse(object):
             input_type='sparse'
         )
 
-        self.model.load_state("")
-
     def generate_feature_matrix(self, info, artist_names, column_map):
         # We create a matrix of feature vectors for each potential artist
         X = np.zeros((len(artist_names), len(column_map)))
 
         # Feature matrix will have the same values for the user information fields
         X[:, 0] = info["age"]
-        X[:, 1] = info["signup"]
         X[:, column_map[f"country_{info['country']}"]] = 1
         X[:, column_map[f"gender_{info['gender']}"]] = 1
 
@@ -30,10 +27,10 @@ class ArtistResponse(object):
 
         return sparse.csr_matrix(X)
 
-    def get_top_predicted_artists(self, info, n=10):
-        top_artists = None
-        column_map = None
+    def get_top_predicted_artists(self, info, column_map, top_artists, n=10):
         X = self.generate_feature_matrix(info, top_artists, column_map)
+        self.model.core.set_num_features(X.shape[1])
+        self.model.load_state("tffm_model/")
         predictions = self.model.predict(X)
         predicted_artists = list(map(lambda artist: top_artists[artist], np.argsort(predictions)[::-1]))
         return predicted_artists[:n]

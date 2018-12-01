@@ -14,6 +14,7 @@
 
 # [START gae_python37_app]
 from flask import Flask, jsonify, request
+from artistlib import ArtistResponse
 import pickle
 import random
 
@@ -36,6 +37,28 @@ def get_top_artists():
         random.seed(seed)
 
     top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+
+
+@app.route("/top_n_artists")
+def get_top_n_artists():
+    info = request.args.get("info", type=dict)
+    num_artists = request.args.get("num_artists", type=int)
+
+    info = {
+        "age": 21,
+        "gender": "m",
+        "country": "United States",
+        "likedArtists": [
+            "beyonce",
+            "drake"
+        ]
+    }
+    column_map = pickle.load(open('column_map.pickle', 'rb'))
+    top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+
+    ar = ArtistResponse()
+    return str(ar.get_top_predicted_artists(info, column_map, top_artists, num_artists))
+
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
