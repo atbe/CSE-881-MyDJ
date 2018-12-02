@@ -44,7 +44,7 @@ def get_top_artists_random():
 
     if top_artists is None:
         top_artists = pickle.load(open('top_artists.pickle', 'rb'))
-        cache.set('top-artists', top_artists, timeout= 5*60)
+        cache.set('top-artists', top_artists, timeout=5 * 60)
 
     return jsonify(random.sample(top_artists, count))
 
@@ -53,6 +53,11 @@ def get_top_artists_random():
 def get_top_n_artists():
     info = request.args.get("info", type=dict)
     num_artists = request.args.get("num_artists", type=int)
+
+    # age = request.args.get("age", type=int)
+    # country = request.args.get("country", type=str)
+    # gender = request.args.get("gender", type=str)
+    # info = {"age": age, "country": country, "gender": gender}
 
     column_map = pickle.load(open('column_map.pickle', 'rb'))
     top_artists = pickle.load(open('top_artists.pickle', 'rb'))
@@ -70,7 +75,7 @@ def get_top_artists():
 
     if top_artists is None:
         top_artists = pickle.load(open('top_artists.pickle', 'rb'))
-        cache.set('top-artists', top_artists, timeout= 5*60)
+        cache.set('top-artists', top_artists, timeout=5 * 60)
 
     start_index = page_num * page_size;
     end_index = start_index + page_size;

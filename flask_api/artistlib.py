@@ -1,7 +1,7 @@
-import tensorflow as tf
 import numpy as np
 from scipy import sparse
 from tffm import TFFMRegressor
+import tensorflow as tf
 
 
 class ArtistResponse(object):
@@ -13,6 +13,13 @@ class ArtistResponse(object):
         )
 
     def generate_feature_matrix(self, info, artist_names, column_map):
+        """
+        Generate the feature matrix
+        :param info: User information
+        :param artist_names: Artists we want to predict for
+        :param column_map: Feature vector column mapping
+        :return: sparse feature matrix
+        """
         # We create a matrix of feature vectors for each potential artist
         X = np.zeros((len(artist_names), len(column_map)))
 
@@ -28,6 +35,14 @@ class ArtistResponse(object):
         return sparse.csr_matrix(X)
 
     def get_top_predicted_artists(self, info, column_map, top_artists, n=10):
+        """
+        Get the top predicted artists for a user
+        :param info: User information
+        :param column_map: Feature vector column mapping
+        :param top_artists: Artists we want to predict for
+        :param n: How many artists we want to return
+        :return: list of the top predicted artists in descending order
+        """
         X = self.generate_feature_matrix(info, top_artists, column_map)
         self.model.core.set_num_features(X.shape[1])
         self.model.load_state("tffm_model/")
