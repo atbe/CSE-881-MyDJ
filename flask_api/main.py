@@ -20,11 +20,12 @@ from artistlib import ArtistResponse
 import pickle
 import random
 import json
+import math
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:4200", "https://cse-881-mydj.firebaseapp.com"]}})
 cache = SimpleCache()
 
 
@@ -60,6 +61,18 @@ def get_top_n_artists():
 
     ar = ArtistResponse()
     return jsonify(ar.get_top_predicted_artists(info, column_map, top_artists, num_artists))
+
+
+@app.route('/get_max_page')
+def get_max_page():
+    page_size = request.args.get("pageSize", 100, type=int)
+    top_artists = cache.get('top-artists')
+
+    if top_artists is None:
+        top_artists = pickle.load(open('top_artists.pickle', 'rb'))
+        cache.set('top-artists', top_artists, timeout=5 * 60)
+
+    return jsonify(math.ceil(len(top_artists)/page_size))
 
 
 @app.route('/top_artists')
