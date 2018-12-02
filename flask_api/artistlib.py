@@ -12,7 +12,7 @@ class ArtistResponse(object):
             input_type='sparse'
         )
 
-    def generate_feature_matrix(self, info, artist_names, column_map):
+    def generate_feature_matrix(self, info, artist_names, favored_artists, column_map):
         """
         Generate the feature matrix
         :param info: User information
@@ -20,16 +20,18 @@ class ArtistResponse(object):
         :param column_map: Feature vector column mapping
         :return: sparse feature matrix
         """
-        # We create a matrix of feature vectors for each potential artist
+        # We create a matrix of fea ture vectors for each potential artist
         X = np.zeros((len(artist_names), len(column_map)))
 
         # Feature matrix will have the same values for the user information fields
         X[:, 0] = info["age"]
-        X[:, column_map[f"country_{info['country']}"]] = 1
-        X[:, column_map[f"gender_{info['gender']}"]] = 1
+        X[:, column_map[f"country_{info['country']['name']}"]] = 1
+
+        if info["gender"] is not None:
+            X[:, column_map[f"gender_{info['gender']}"]] = 1
 
         # Set the proper one-hot vector for artist
-        for i, name in enumerate(artist_names):
+        for i, name in enumerate(favored_artists):
             X[i, column_map[f"artistName_{name}"]] = 1
 
         return sparse.csr_matrix(X)
@@ -43,7 +45,7 @@ class ArtistResponse(object):
         :param n: How many artists we want to return
         :return: list of the top predicted artists in descending order
         """
-        X = self.generate_feature_matrix(info, top_artists, column_map)
+        X = self.generate_feature_matrix(info, top_artists, info["artists_names"], column_map)
         self.model.core.set_num_features(X.shape[1])
         self.model.load_state("tffm_model/")
         predictions = self.model.predict(X)

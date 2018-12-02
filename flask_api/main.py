@@ -19,6 +19,7 @@ from werkzeug.contrib.cache import SimpleCache
 from artistlib import ArtistResponse
 import pickle
 import random
+import json
 
 # If `entrypoint` is not defined in app.yaml, App Engine will look for an app
 # called `app` in `main.py`.
@@ -49,15 +50,10 @@ def get_top_artists_random():
     return jsonify(random.sample(top_artists, count))
 
 
-@app.route("/top_n_artists")
+@app.route("/top_n_artists", methods=["POST"])
 def get_top_n_artists():
-    info = request.args.get("info", type=dict)
+    info = json.loads(request.form.get("info"))
     num_artists = request.args.get("num_artists", type=int)
-
-    # age = request.args.get("age", type=int)
-    # country = request.args.get("country", type=str)
-    # gender = request.args.get("gender", type=str)
-    # info = {"age": age, "country": country, "gender": gender}
 
     column_map = pickle.load(open('column_map.pickle', 'rb'))
     top_artists = pickle.load(open('top_artists.pickle', 'rb'))
