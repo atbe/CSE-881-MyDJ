@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
 		}
 
 		this.firstFormGroup = this._formBuilder.group({
-			nameCtrl: [Validators.required, Validators.nullValidator]
+			nameCtrl: []
 		});
 		this.ageFormGroup = this._formBuilder.group({
 			ageCtrl: [Validators.required, Validators.min(1)],
@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
 			name: this.firstFormGroup.get('nameCtrl').value,
 			age: +this.ageFormGroup.get('ageCtrl').value,
 			gender: this.genderFormGroup.get('genderCtrl').value,
-			country: this.countries.find(c => c.code === this.countryFormGroup.get('countryCtrl').value),
+			country: this.countries.find(c => c.name === this.countryFormGroup.get('countryCtrl').value),
 			favoriteArtists: []
 		} as User;
 

@@ -15,7 +15,6 @@ export class NapsterService {
 	private accessToken: string;
 	private refreshToken: string;
 	readonly API_BASE_URL = "https://api.napster.com/v2.2";
-	readonly IMG_BASE_URL = "https://direct.napster.com/imageserver/v2/";
 
 	artistCache = {};
 	artistCoverUrlCache = {};

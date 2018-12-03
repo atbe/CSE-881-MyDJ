@@ -37,7 +37,7 @@ export class UserService {
 		this.storage.clear();
 	}
 
-	public getRandomArtist(): string {
-		return this.getUser().favoriteArtists[Math.floor(Math.random() * this.getUser().favoriteArtists.length)];
+	public getRandomPredictedArtist(): string {
+		return this.getUser().predictedArtists[Math.floor(Math.random() * this.getUser().predictedArtists.length)];
 	}
 }

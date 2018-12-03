@@ -12,7 +12,6 @@ declare var Napster: any;
 	styleUrls: ['./music-player.component.less']
 })
 export class MusicPlayerComponent implements OnInit, OnDestroy {
-
 	tracks: Track[];
 	artistTopTracksCache = {};
 	trackCache = {};
@@ -30,14 +29,6 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
 		private http: HttpClient,
 		private userService: UserService,
 		private napsterService: NapsterService) {
-
-		// temporary
-		// this.userService.likeArtist('The Beatles');
-		// this.userService.likeArtist('Beyonce');
-		// this.userService.likeArtist('Drake');
-		// this.userService.likeArtist('21 savage');
-		// this.userService.likeArtist('2pac');
-
 		Napster.init({  consumerKey: this.napsterService.getApiKey(), isHTML5Compatible: true });
 	}
 
@@ -93,7 +84,7 @@ export class MusicPlayerComponent implements OnInit, OnDestroy {
 	async getNextArtist(): Promise<any> {
 		let artist: any = null;
 		while (artist === null) {
-			const artistToPlay = this.userService.getRandomArtist();
+			const artistToPlay = this.userService.getRandomPredictedArtist();
 			console.log("Starting play for " + artistToPlay);
 			artist = await this.getArtist(artistToPlay);
 			if (artist === null) {

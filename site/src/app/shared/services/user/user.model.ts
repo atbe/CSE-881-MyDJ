@@ -6,4 +6,5 @@ export default interface User {
 	gender: string;
 	country: Country;
 	favoriteArtists: string[];
+	predictedArtists: string[];
 }

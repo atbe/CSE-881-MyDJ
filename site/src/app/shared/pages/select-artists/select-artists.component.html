@@ -3,16 +3,27 @@
     <h2>Loading artists...</h2>
 </div>
 
-<div *ngIf="!isLoading">
+<div>
     <div fxFlex="1 1 auto"></div>
     <div fxFlex="1 1 70%" *ngIf="artistImageUrls != null">
-        <p
-                class="center"><i>Click on an artist to add them to your favorites. You <strong>must choose
+        <p class="center"><i>Click on an artist to add them to your favorites. You <strong>must choose
             at least 5.</strong></i></p>
         <button [disabled]="this.user.favoriteArtists.length < 5" mat-raised-button color="accent"
-                (click)="onDone()">Done
-        </button>
-        <div fxLayout="row wrap" fxLayoutGap="16px" fxLayoutAlign="flex-start">
+                (click)="onDone()">Done</button>
+        <div class="page-select" *ngIf="!isLoading">
+            <div class="label">Go to page:</div>
+            <mat-form-field>
+                <mat-select [ngModel]="manualPage" (ngModelChange)="onGoToPage($event)">
+                    <mat-option *ngFor="let pageNum of pageNumbers" [value]="pageNum">{{pageNum + 1}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-paginator [length]="maxPage * PAGE_SIZE"
+                           [pageSize]="PAGE_SIZE"
+                           [pageIndex]="currentPage"
+                           (page)="onPageEvent($event)">
+            </mat-paginator>
+        </div>
+        <div fxLayout="row wrap" fxLayoutGap="16px" fxLayoutAlign="flex-start" *ngIf="!isLoading">
             <ng-container *ngFor="let artist of artists">
                 <div matRipple
                     (click)="toggleArtist(artist)"
@@ -24,7 +35,6 @@
                         <img class="center" src="{{getArtistCoverUrl(artist)}}">
                         <figcaption>{{artist['name']}} <mat-icon *ngIf="isArtistSelected(artist['name'])">check_circle
                         </mat-icon></figcaption>
-
                     </figure>
                 </div>
             </ng-container>

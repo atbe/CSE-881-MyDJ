@@ -4,7 +4,7 @@
             <form [formGroup]="firstFormGroup">
                 <ng-template matStepLabel>Fill out your name</ng-template>
                 <mat-form-field>
-                    <input matInput formControlName="nameCtrl" placeholder="Name" required>
+                    <input matInput formControlName="nameCtrl" placeholder="Name" required type="text">
                 </mat-form-field>
                 <div>
                     <button mat-button matStepperNext>Next</button>
@@ -28,9 +28,9 @@
                 <ng-template matStepLabel>Fill out your gender</ng-template>
                 <mat-form-field>
                     <mat-select required placeholder="Gender" formControlName="genderCtrl">
-                        <mat-option value="male">Male</mat-option>
-                        <mat-option value="female">Female</mat-option>
-                        <mat-option value="unspecified">Unspecified</mat-option>
+                        <mat-option value="m">Male</mat-option>
+                        <mat-option value="f">Female</mat-option>
+                        <mat-option value="None">Unspecified</mat-option>
                     </mat-select>
                     <mat-label>Gender</mat-label>
                 </mat-form-field>
@@ -45,7 +45,7 @@
                 <ng-template matStepLabel>Fill out your country</ng-template>
                 <mat-form-field>
                     <mat-select required placeholder="Country" formControlName="countryCtrl">
-                        <mat-option *ngFor="let country of countries" value="{{country.code}}">{{country
+                        <mat-option *ngFor="let country of countries" value="{{country.name}}">{{country
                             .name}}</mat-option>
                     </mat-select>
                     <mat-label>Country</mat-label>

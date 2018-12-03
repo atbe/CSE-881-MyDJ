@@ -4,7 +4,7 @@ import {
 	MatButtonModule, MatCardModule,
 	MatFormFieldModule,
 	MatGridListModule, MatIconModule,
-	MatInputModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule,
+	MatInputModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule,
 	MatSelectModule,
 	MatStepperModule
 } from '@angular/material';
@@ -34,7 +34,8 @@ import { HttpClientModule } from '@angular/common/http';
 		HttpClientModule,
 		MatProgressBarModule,
 		MatIconModule,
-		MatProgressSpinnerModule
+		MatProgressSpinnerModule,
+		MatPaginatorModule
 	]
 })
 export class PagesModule { }
