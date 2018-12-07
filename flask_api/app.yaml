@@ -1,0 +1,9 @@
+runtime: python
+manual_scaling:
+    instances: 1
+threadsafe: yes
+entrypoint: gunicorn -b :$PORT main:app
+env: flex
+runtime_config:
+  # You can also specify 2 for Python 2.7
+  python_version: 3

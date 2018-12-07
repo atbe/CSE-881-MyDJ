@@ -1,0 +1,6 @@
+Flask==1.0.2
+scipy==1.1.0
+tffm==1.0.1
+tensorflow==1.7.0
+gunicorn==19.3.0
+flask-cors
